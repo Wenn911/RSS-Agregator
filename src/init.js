@@ -1,7 +1,7 @@
 import i18next from 'i18next';
 import { setLocale } from 'yup';
 
-import resources from './locales/index.js';
+import resources from './locales/resources.js';
 import { handleAddFeed, handleSelectLanguage } from './handlers.js';
 import initView from './view.js';
 
