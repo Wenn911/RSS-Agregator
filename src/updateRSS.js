@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import _ from 'lodash';
 
-import loadRSS from './loadRSS';
+import loadRSS from './loadRSS.js';
 
 const links = [];
 

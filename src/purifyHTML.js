@@ -1,3 +1,3 @@
-import DOMpurify from 'dompurify';
+import DOMPurify from 'dompurify';
 
-export default (html) => DOMpurify.sanitize(html);
+export default (html) => DOMPurify.sanitize(html);

@@ -1,27 +1,31 @@
-/* eslint-disable no-param-reassign */
-import 'bootstrap';
 import $ from 'jquery';
+import 'bootstrap';
 
-import validateLink from './validation';
-import loadRSS from './loadRSS';
-import updateRSS from './updateRSS';
+import validateLink from './validateLink.js';
+import loadRSS from './loadRSS.js';
+import updateRSS from './updateRSS.js';
 
 export const handleAddFeed = (e, state, i18nInstance) => {
   e.preventDefault();
 
   const formData = new FormData(e.target);
   const link = formData.get('url').trim();
+
   const error = validateLink(link, state.feeds);
   state.form.error = error;
 
   if (!error) {
     state.form.state = 'pending';
+
     loadRSS(link)
       .then((rss) => {
         state.feeds.unshift(rss.feed);
         state.posts = [...rss.posts, ...state.posts];
+
         state.form.state = 'success';
+
         updateRSS(link, state);
+
         e.target.reset();
       })
       .catch((err) => {
@@ -43,8 +47,9 @@ export const handleSelectLanguage = (e, state, i18nInstance) => {
 
   const buttonGroup = e.target.closest('.btn-group');
   const active = buttonGroup.querySelector('.active');
-  active.classList.remove('.btn-light');
-  active.classList.add('.btn-outline-light');
+
+  active.classList.remove('btn-light');
+  active.classList.add('btn-outline-light');
 
   e.target.parentElement.classList.remove('btn-outline-light');
   e.target.parentElement.classList.add('btn-light');
@@ -52,16 +57,21 @@ export const handleSelectLanguage = (e, state, i18nInstance) => {
 
 export const handleViewPost = (post) => {
   document.body.classList.add('modal-open');
+
   document.querySelector('.modal-title').textContent = post.title;
-  document.querySelector('.modal-body').textContent = post.desc;
-  document.querySelector('.full-aricle').href = post.url;
+
+  document.querySelector('.modal-body').innerHTML = post.desc;
+
+  document.querySelector('.full-article').href = post.url;
 
   const modal = document.querySelector('#modal');
+
   $(modal).modal({ show: true });
 };
 
 export const handleCloseModal = () => {
   document.body.classList.remove('modal-open');
+
   const modal = document.querySelector('#modal');
 
   $(modal).modal({ show: false });

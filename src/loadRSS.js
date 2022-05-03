@@ -1,11 +1,9 @@
 import axios from 'axios';
-import parseRSS from './parseRSS';
+import parseRSS from './parseRSS.js';
 
 const routes = {
   allOrigins: (url) => {
-    const result = new URL('get', 'https://hexlet-allorigins.herokuapp.com');
-    result.searchParams.set('url', url);
-    result.searchParams.set('disableCache', 'true');
+    const result = new URL('get', `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`);
     return result.toString();
   },
 };
