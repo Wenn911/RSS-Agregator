@@ -18,5 +18,5 @@ export default (xmlString) => {
     });
     return { feedTitle, feedDescription, posts };
   }
-  throw new Error('invalidRSS');
+  throw new Error('parsingError');
 };

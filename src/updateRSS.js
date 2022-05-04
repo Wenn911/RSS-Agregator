@@ -42,7 +42,7 @@ export default (state, watchedState, selectors) => {
       .then(() => updateFeed(rss, state, watchedState))
       .then(() => {
         watched.rssForm.errors = null;
-        watched.rssForm.state = 'success';
+        watched.rssForm.state = 'successLoad';
       })
       .catch((error) => {
         watched.rssForm.errors = error.message;

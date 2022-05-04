@@ -1,15 +1,13 @@
 export default {
   translation: {
+    successLoad: 'RSS успешно загружен',
+    invalidUrl: 'Ссылка должна быть валидным URL',
+    allreadyExist: 'RSS уже существует',
+    parsingError: 'Ресурс не содержит валидный RSS',
+    netWorkError: 'Ошибка сети',
+    view: 'Просмотр',
+    emptyField: 'Не должно быть пустым',
     feeds: 'Фиды',
     posts: 'Посты',
-    invalidUrl: 'Ссылка должна быть валидным URL',
-    rssExists: 'RSS уже существует',
-    netError: 'Ошибка сети, проверьте подключение к интернету',
-    invalidRSS: 'Ресурс не содержит валидным RSS',
-    emptyField: 'Не должно быть пустым',
-    success: 'RSS успешно загржен',
-    view: 'Просмотр',
-    close: 'Закрыть',
-    readArticle: 'Читать полностью',
   },
 };

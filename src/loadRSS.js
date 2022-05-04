@@ -7,6 +7,6 @@ export default (rss) => {
   return axios.get(parsedURL.href)
     .then((response) => response.data.contents)
     .catch(() => {
-      throw new Error('netError');
+      throw new Error('netWorkError');
     });
 };
