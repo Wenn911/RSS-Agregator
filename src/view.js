@@ -1,153 +1,137 @@
-/* eslint-disable no-param-reassign */
-import onChange from 'on-change';
+const formRender = (state, selectors, i18nInstance) => {
+  const elements = selectors;
+  const formState = state.rssForm.state;
+  const errors = state.rssForm.errors ? state.rssForm.errors : null;
 
-import { handleViewPost, handleCloseModal } from './handlers.js';
+  elements.notificationElement.textContent = '';
+  elements.notificationElement.classList.remove('text-danger');
+  elements.notificationElement.classList.remove('text-success');
+  elements.inputElement.classList.remove('is-invalid');
+  elements.inputElement.focus();
 
-const buildPosts = (state, posts, i18nInstance) => {
-  const postsContainer = document.querySelector('.posts');
-  postsContainer.innerHTML = `<h2>${i18nInstance.t('posts')}</h2>`;
-
-  const ul = document.createElement('ul');
-  ul.classList.add('list-group');
-
-  posts.forEach((post) => {
-    const isViewed = state.uiState.viewedPostsIds.includes(post.id);
-
-    const li = document.createElement('li');
-    li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start');
-    li.dataset.id = post.id;
-
-    li.innerHTML = `
-    <a href="${post.url}" class="${isViewed ? 'font-weight-normal' : 'font-weight-bold'}" target="_blank" rel="noopener noreferrer">
-      ${post.title}
-    </a>
-    <button type="button" class="btn btn-primary btn-sm">${i18nInstance.t('buttons.view')}</button>
-    `;
-
-    const a = li.querySelector('a');
-    const button = li.querySelector('button');
-
-    a.addEventListener('click', () => {
-      if (!isViewed) {
-        state.uiState.viewedPostsIds.push(post.id);
-      }
-    });
-
-    button.addEventListener('click', () => {
-      if (!isViewed) {
-        state.uiState.viewedPostsIds.push(post.id);
-      }
-
-      handleViewPost(post);
-    });
-
-    ul.append(li);
-  });
-
-  postsContainer.append(ul);
-};
-
-const buildFeeds = (feeds, i18nInstance) => {
-  const feedsContainer = document.querySelector('.feeds');
-  feedsContainer.innerHTML = `<h2>${i18nInstance.t('feeds')}</h2>`;
-
-  const ul = document.createElement('ul');
-  ul.classList.add('list-group', 'mb-5');
-
-  feeds.forEach((feed) => {
-    const li = document.createElement('li');
-    li.classList.add('list-group-item');
-    li.dataset.id = feed.id;
-
-    li.innerHTML = `
-    <h3>${feed.title}</h3>
-    <p>${feed.desc}</p>
-    `;
-
-    ul.append(li);
-  });
-
-  feedsContainer.append(ul);
-};
-
-const render = (state, i18nInstance) => {
-  if (state.feeds.length > 0) {
-    buildFeeds(state.feeds, i18nInstance);
-    buildPosts(state, state.posts, i18nInstance);
+  switch (formState) {
+    case 'processing':
+      elements.submitButton.disabled = true;
+      elements.inputElement.setAttribute('readonly', 'true');
+      break;
+    case 'successLoad':
+      elements.notificationElement.classList.add('text-success');
+      elements.notificationElement.textContent = i18nInstance.t(formState);
+      elements.inputElement.value = '';
+      elements.submitButton.disabled = false;
+      elements.inputElement.removeAttribute('readonly');
+      break;
+    case 'unsuccessfulLoad':
+      elements.notificationElement.classList.add('text-danger');
+      elements.inputElement.classList.add('is-invalid');
+      elements.notificationElement.textContent = i18nInstance.t(errors);
+      elements.submitButton.disabled = false;
+      elements.inputElement.removeAttribute('readonly');
+      break;
+    default:
+      break;
   }
+};
 
-  const fullArticleButton = document.querySelector('.full-article');
-  const closeButtons = document.querySelectorAll('[data-dismiss="modal"]');
+const renderModal = (title, link, description) => {
+  const modalTitle = document.querySelector('.modal-title');
+  const modalDiscription = document.querySelector('.modal-body');
+  const button = document.querySelector('.btn-primary');
+  button.href = link;
+  modalTitle.textContent = title;
+  modalDiscription.textContent = description;
+};
 
-  fullArticleButton.textContent = i18nInstance.t('buttons.readArticle');
-  closeButtons[1].textContent = i18nInstance.t('buttons.close');
-
-  closeButtons.forEach((closeButton) => {
-    closeButton.addEventListener('click', handleCloseModal);
+const renderFeeds = (state, selectors, i18nInstance) => {
+  const elements = selectors;
+  elements.feedContainer.innerHTML = '';
+  const feedCard = document.createElement('div');
+  feedCard.classList.add('card-body');
+  const feedTittle = document.createElement('h3');
+  feedTittle.textContent = i18nInstance.t('feeds');
+  feedCard.append(feedTittle);
+  elements.feedContainer.append(feedCard);
+  const ulElement = document.createElement('ul');
+  ulElement.classList.add('list-group');
+  ulElement.classList.add('border-0');
+  ulElement.classList.add('rounded-0');
+  state.feeds.map(({ feedTitle, feedDescription }) => {
+    const liElement = document.createElement('li');
+    liElement.classList.add('list-group-item');
+    const itemTitle = document.createElement('h6');
+    itemTitle.textContent = feedTitle;
+    const itemDescription = document.createElement('p');
+    itemDescription.classList.add('small');
+    itemDescription.classList.add('text-black-50');
+    itemDescription.textContent = feedDescription;
+    liElement.append(itemTitle);
+    liElement.append(itemDescription);
+    ulElement.append(liElement);
+    return true;
   });
+  elements.feedContainer.append(ulElement);
 };
 
-const clearFeedback = () => {
-  const input = document.querySelector('.form-control');
-  const feedback = document.querySelector('.feedback');
+const postsRender = (state, selectors, watchedUIState, i18nInstance) => {
+  const elements = selectors;
+  const ui = watchedUIState;
+  elements.postsContainer.innerHTML = '';
+  const postCard = document.createElement('div');
+  postCard.classList.add('card-body');
+  const postTittle = document.createElement('h3');
+  postTittle.textContent = i18nInstance.t('posts');
+  postCard.append(postTittle);
+  elements.postsContainer.append(postCard);
 
-  feedback.textContent = '';
-  feedback.classList.remove('text-danger', 'text-success');
-  input.classList.remove('is-invalid');
+  const postUlElement = document.createElement('ul');
+  state.posts.map(({
+    link, title, postId, description,
+  }) => {
+    const liElement = document.createElement('li');
+    liElement.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'border-0', 'border-end-0');
+    const itemTitle = document.createElement('a');
+    itemTitle.dataset.id = postId;
+    itemTitle.setAttribute('href', link);
+    itemTitle.setAttribute('target', '_blank');
+    itemTitle.textContent = title;
+    liElement.append(itemTitle);
+    const buttonEl = document.createElement('button');
+    buttonEl.setAttribute('type', 'button');
+    buttonEl.dataset.id = postId;
+    buttonEl.classList.add('btn', 'btn-outline-primary', 'btn-sm');
+    buttonEl.dataset.bsToggle = 'modal';
+    buttonEl.dataset.bsTarget = '#exampleModal';
+    buttonEl.textContent = i18nInstance.t('view');
+    liElement.append(buttonEl);
+    postUlElement.append(liElement);
+
+    itemTitle.addEventListener('click', (e) => {
+      ui[e.target.dataset.id] = 'shown';
+    });
+    buttonEl.addEventListener('click', (e) => {
+      renderModal(title, link, description);
+      ui[e.target.dataset.id] = 'shown';
+    });
+    return true;
+  });
+  elements.postsContainer.append(postUlElement);
 };
 
-const toggleForm = (status) => {
-  const submitButton = document.querySelector('[type="submit"]');
-  const input = document.querySelector('.form-control');
-
-  submitButton.disabled = status;
-  input.readOnly = status;
-};
-
-export default (state, i18nInstance) => {
-  const input = document.querySelector('.form-control');
-  const feedback = document.querySelector('.feedback');
-
-  const watchedState = onChange(state, (path, value) => {
-    if (path === 'form.state') {
-      switch (value) {
-        case 'pending':
-          toggleForm(true);
-          clearFeedback();
-          break;
-        case 'success':
-          toggleForm(false);
-          clearFeedback();
-          feedback.textContent = i18nInstance.t('success');
-          feedback.classList.add('text-success');
-          break;
-        case 'failed':
-          toggleForm(false);
-          clearFeedback();
-          feedback.textContent = state.form.error;
-          input.classList.add('is-invalid');
-          feedback.classList.add('text-danger');
-          break;
-        default:
-          throw new Error(`Unexpected state: ${value}`);
-      }
-    } else if (path === 'form.error') {
-      feedback.textContent = '';
-      if (value) {
-        input.classList.add('is-invalid');
-        feedback.classList.add('text-danger');
-        feedback.textContent = state.form.error;
-      } else {
-        input.classList.remove('is-invalid');
-        feedback.classList.remove('text-danger');
-      }
-    } else if (path === 'lang') {
-      clearFeedback();
-      render(watchedState, i18nInstance);
+const UIRender = (uiState) => {
+  const anchors = document.querySelectorAll('a');
+  anchors.forEach((anchor) => {
+    if (uiState[anchor.dataset.id] === 'shown') {
+      anchor.classList.remove('fw-bold');
+      anchor.classList.add('fw-normal');
+      anchor.classList.add('link-secondary');
     } else {
-      render(watchedState, i18nInstance);
+      anchor.classList.remove('fw-normal');
+      anchor.classList.add('fw-bold');
+      anchor.classList.remove('link-secondary');
     }
   });
+};
 
-  return watchedState;
+export {
+  formRender, postsRender, renderModal, UIRender, renderFeeds,
 };

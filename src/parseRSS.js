@@ -1,36 +1,22 @@
-import _ from 'lodash';
-// eslint-disable-next-line import/extensions
-import purifyHTML from './purifyHTML.js';
-
-export default (link, content) => {
+export default (xmlString) => {
   const parser = new DOMParser();
-  const rss = parser.parseFromString(content, 'text/html');
-  const feedId = _.uniqueId();
+  const data = parser.parseFromString(xmlString, 'text/xml');
 
-  const result = {
-    feed: null,
-    posts: [],
-  };
-
-  const title = rss.querySelector('title').textContent;
-  const desc = rss.querySelector('description').textContent;
-
-  rss.querySelectorAll('item')
-    .forEach((post) => {
-      const postTitle = post.querySelector('title').textContent;
-      const postDesc = post.querySelector('description').textContent;
-      const postLink = post.querySelector('link').textContent;
-
-      const postId = _.uniqueId();
-
-      const data = {
-        id: postId, feedId, title: postTitle, desc: purifyHTML(postDesc), url: postLink,
+  if (!data.querySelector('parsererror')) {
+    const feedTitle = data.querySelector('title').textContent;
+    const feedDescription = data.querySelector('description').textContent;
+    const items = data.querySelectorAll('item');
+    const posts = Array.from(items).map((post) => {
+      const title = post.querySelector('title').textContent;
+      const description = post.querySelector('description').textContent;
+      const postlink = post.querySelector('link').textContent;
+      return {
+        title,
+        description,
+        postlink,
       };
-
-      result.posts.push(data);
     });
-  result.feed = {
-    id: feedId, title, desc, url: link,
-  };
-  return result;
+    return { feedTitle, feedDescription, posts };
+  }
+  throw new Error('parsingError');
 };

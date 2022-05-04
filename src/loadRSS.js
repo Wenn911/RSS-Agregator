@@ -1,12 +1,12 @@
 import axios from 'axios';
-import parseRSS from './parseRSS.js';
 
-const routes = {
-  allOrigins: (url) => {
-    const result = new URL('get', `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`);
-    return result.toString();
-  },
+export default (rss) => {
+  const parsedURL = new URL('https://allorigins.hexlet.app/get');
+  parsedURL.searchParams.set('disableCache', 'true');
+  parsedURL.searchParams.set('url', rss);
+  return axios.get(parsedURL.href)
+    .then((response) => response.data.contents)
+    .catch(() => {
+      throw new Error('netWorkError');
+    });
 };
-
-export default (link) => axios.get(routes.allOrigins(link))
-  .then((response) => parseRSS(link, response.data.contents));

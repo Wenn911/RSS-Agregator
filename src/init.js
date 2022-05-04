@@ -1,55 +1,66 @@
+import onChange from 'on-change';
 import i18next from 'i18next';
-import { setLocale } from 'yup';
+import controller from './updateRSS.js';
+import ru from './locales/ru.js';
 
-import resources from './locales/resources.js';
-import { handleAddFeed, handleSelectLanguage } from './handlers.js';
-import initView from './view.js';
+import {
+  formRender, postsRender, UIRender, renderFeeds,
+} from './view.js';
 
-export default () => {
+const runApp = () => {
+  const defaultLanguage = 'ru';
   const state = {
-    lang: 'en',
-    form: {
-      state: 'filling',
-      error: null,
-    },
-    updateProcess: {
-      state: 'idle',
+    lng: defaultLanguage,
+    rssForm: {
+      state: null,
+      inputStatus: 'unblocked',
+      errors: {},
     },
     feeds: [],
     posts: [],
-    uiState: {
-      viewedPostsIds: [],
-    },
   };
+
+  const uiState = {};
 
   const i18nInstance = i18next.createInstance();
   i18nInstance.init({
-    lng: state.lang,
-    resources,
-  }).then(() => {
-    setLocale({
-      mixed: {
-        notOneOf: () => i18nInstance.t('errors.rssExists'),
-      },
-      string: {
-        url: () => i18nInstance.t('errors.invalidURL'),
-      },
-    });
+    lng: state.lng,
+    debug: false,
+    resources: {
+      ru,
+    },
   });
 
-  const watchedState = initView(state, i18nInstance);
+  const selectors = {
+    formElement: document.querySelector('.rss-form'),
+    inputElement: document.querySelector('.form-control'),
+    submitButton: document.querySelector('button[type="submit"]'),
+    notificationElement: document.querySelector('.feedback'),
+    feedContainer: document.querySelector('.feeds'),
+    postsContainer: document.querySelector('.posts'),
+  };
 
-  const form = document.querySelector('.rss-form');
-
-  const languageSelectors = document.querySelectorAll('[data-lang]');
-
-  form.addEventListener('submit', (e) => {
-    handleAddFeed(e, watchedState, i18nInstance);
+  const watchedUIState = onChange(uiState, () => {
+    UIRender(uiState);
   });
 
-  languageSelectors.forEach((languageSelector) => {
-    languageSelector.addEventListener('click', (e) => {
-      handleSelectLanguage(e, watchedState, i18nInstance);
-    });
+  const watchedState = onChange(state, (path) => {
+    switch (path) {
+      case 'rssForm.state':
+        formRender(state, selectors, i18nInstance);
+        break;
+      case 'feeds':
+        renderFeeds(state, selectors, i18nInstance);
+        break;
+      case 'posts':
+        postsRender(state, selectors, watchedUIState, i18nInstance);
+        UIRender(uiState);
+        break;
+      default:
+    }
   });
+
+  controller(state, watchedState, selectors);
 };
+
+export default runApp;

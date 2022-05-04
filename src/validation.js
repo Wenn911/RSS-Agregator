@@ -1,13 +1,7 @@
 import * as yup from 'yup';
 
-export default (link, feeds) => {
-  const urls = feeds.map(({ url }) => url);
-  const schema = yup.string().url().notOneOf(urls);
-
-  try {
-    schema.validateSync(link);
-    return null;
-  } catch (e) {
-    return e.message;
-  }
+export default (link, state) => {
+  const feedsLinks = state.feeds.map(({ feedLink }) => feedLink);
+  const schema = yup.string().url('invalidUrl').notOneOf(feedsLinks, 'allreadyExist').required('emptyField');
+  return schema.validate(link, { abortEarly: false });
 };

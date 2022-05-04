@@ -1,31 +1,52 @@
-/* eslint-disable no-param-reassign */
-import _ from 'lodash';
-
+import uniqueId from 'lodash/uniqueId.js';
+import getParse from './parseRSS.js';
+import validate from './validation.js';
 import loadRSS from './loadRSS.js';
 
-const links = [];
-
-const updateRSS = (state) => {
-  const promises = links.map(loadRSS);
-  Promise.all(promises)
-    .then((results) => {
-      const posts = results.flatMap((result) => result.posts);
-      const allPosts = _.union(posts, state.posts);
-      const newPosts = _.difference(allPosts, state.posts, 'url');
-
-      if (newPosts.length > 0) {
-        state.posts = [...newPosts, ...state.posts];
+const updateFeed = (link, state, watchedState) => {
+  const watched = watchedState;
+  return loadRSS(link)
+    .then((data) => {
+      const { feedTitle, feedDescription, posts } = getParse(data);
+      const feedsLinks = state.feeds.map(({ feedLink }) => feedLink);
+      if (!feedsLinks.includes(link)) {
+        watched.feeds.unshift({
+          feedId: uniqueId(), feedLink: link, feedTitle, feedDescription,
+        });
       }
-    })
-    .finally(() => {
-      setTimeout(() => updateRSS(state), 5000);
+      const currentFeedId = (state.feeds.find((feed) => feed.feedLink === link)).feedId;
+      const oldPosts = state.posts
+        .filter(({ feedId }) => feedId === currentFeedId)
+        .map(({ postlink }) => postlink);
+      const newPosts = posts
+        .filter(({ postlink }) => !oldPosts.includes(postlink))
+        .map(({ title, description, postlink }) => ({
+          feedId: currentFeedId, postId: uniqueId(), title, description, postlink,
+        }));
+      watched.posts.unshift(...newPosts);
+      setTimeout(updateFeed, 5000, link, state, watchedState);
     });
 };
 
-export default (link, state) => {
-  links.push(link);
-  if (state.updateProcess.state === 'idle') {
-    state.updateProcess.state = 'running';
-    setTimeout(() => updateRSS(state), 5000);
-  }
+export default (state, watchedState, selectors) => {
+  const elements = selectors;
+  const watched = watchedState;
+  elements.inputElement.focus();
+
+  elements.formElement.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const rss = formData.get('url');
+    watched.rssForm.state = 'processing';
+    validate(rss, state)
+      .then(() => updateFeed(rss, state, watchedState))
+      .then(() => {
+        watched.rssForm.errors = null;
+        watched.rssForm.state = 'successLoad';
+      })
+      .catch((error) => {
+        watched.rssForm.errors = error.message;
+        watched.rssForm.state = 'unsuccessfulLoad';
+      });
+  });
 };
