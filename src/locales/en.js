@@ -1,18 +1,31 @@
-export default {
+const en = {
   translation: {
-    feeds: 'Feeds',
-    posts: 'Posts',
-    errors: {
-      invalidUrl: 'The link must be a valid URL',
-      rssExists: 'RSS already exists',
-      netError: 'Network error, check your internet connection',
-      invalidRSS: 'The resource does not contain valid RSS',
-    },
     success: 'RSS uploaded successfully',
-    buttons: {
-      view: 'Viewing',
+    errors: {
+      empty: 'Must not be empty',
+      url: 'Link must be a valid URL',
+      uniq: 'TRSS already exists',
+      parse: 'The resource does not contain valid RSS',
+      request: 'Network error',
+      modal: 'Modal window display error',
+    },
+    trans: {
+      title: 'RSS aggregator',
+      subTitle: 'Start reading RSS today! It\'s easy, it\'s beautiful.',
+      label: 'RSS link',
+      button: 'Add',
+      example: 'Example: https://ru.hexlet.io/lessons.rss',
+    },
+    cards: {
+      feeds: 'Feeds',
+      posts: 'Posts',
+      button: 'View',
+    },
+    modal: {
+      read: 'Read all',
       close: 'Close',
-      readArticle: 'Read completely',
     },
   },
 };
+
+export default en;
