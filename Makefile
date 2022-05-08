@@ -19,4 +19,7 @@ test-watch:
 link:
 	npm link
 
-setup: install link
+setup: 
+	install link
+start:
+	npx webpack serve
