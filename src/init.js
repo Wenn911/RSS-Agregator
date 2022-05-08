@@ -3,6 +3,7 @@ import onChange from 'on-change';
 import render from './renders.js';
 import resources from './locales/resources.js';
 import view from './view.js';
+import 'bootstrap';
 // Переписал логику вотчера, убрал отдельный стейт, сократил код
 export default () => {
   const elements = {
