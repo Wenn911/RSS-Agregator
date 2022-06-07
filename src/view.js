@@ -1,92 +1,57 @@
-/* eslint-disable no-param-reassign */
-import axios from 'axios';
-import validator from './validation.js';
-import parser from './parseRSS.js';
+import onChange from 'on-change';
+import render from './render.js';
 
-const makeRequest = (url) => {
-  const uri = encodeURIComponent(url);
-  const proxy = `https://allorigins.hexlet.app/get?disableCache=true&url=${uri}`;
-
-  return axios.get(proxy)
-    .then(({ data }) => data.contents)
-    .catch(() => { throw Error('errors.request'); });
-};
-
-const updateState = (state, url, parsedData) => {
-  const { receivedFeed, receivedPosts } = parsedData;
-  state.feeds = [...state.feeds, receivedFeed];
-  state.posts = [...state.posts, ...receivedPosts];
-  state.urls = [...state.urls, url];
-  state.error = false;
-  return url;
-};
-
-const getIds = (posts) => posts.map(({ id }) => id);
-const extractUpdatedPosts = (state, { receivedPosts }) => {
-  const oldPosts = state.posts;
-  const [receivedIds, oldIds] = [receivedPosts, oldPosts].map(getIds);
-  const newIds = receivedIds.filter(
-    (receivedId) => !oldIds.includes(receivedId),
-  );
-  if (newIds.length) {
-    const newPosts = receivedPosts.filter(({ id }) => newIds.includes(id));
-    state.posts = [...state.posts, ...newPosts];
+const watch = (state, translate) => onChange(state, (path, value) => {
+  if (path === 'view.form.valid') {
+    render.urlInputSetBorder(value);
   }
-};
 
-// Делегируем оброботку события одному ul, а не каждому li элементам
-const addUlListener = (state) => () => {
-  const ul = document.getElementById('posts').querySelector('ul');
-  ul.addEventListener('click', (e) => {
-    if (e.target.tagName !== 'BUTTON') return;
-    const btn = e.target;
-    const selectedId = btn.getAttribute('data-id');
-    state.openPost = selectedId;
-    const selectedPost = state.posts.filter(({ id }) => id === selectedId);
-    selectedPost[0].wasRead = true;
-    const { title, description, url } = selectedPost[0]; // [0] Из-за proxy
+  if (path === 'view.form.message') {
+    const text = translate(value);
+    const { view: { form: { valid } } } = state;
+    render.setFormMessage(text, valid);
+  }
 
-    const modal = document.getElementById('modal');
-    const [modalTitle, modalContent] = [
-      modal.querySelector('.modal-title'),
-      modal.querySelector('#modal-content'),
-    ];
-    const a = modal.querySelector('a');
-    a.href = url;
-    modalTitle.textContent = title;
-    modalContent.textContent = description;
-  });
-};
+  if (path === 'view.form.processing' && value) {
+    render.urlInputReadonly();
+    render.formButtonDisable();
+  }
 
-const formBlocked = (state) => { state.readonly = true; };
-const formUnlocked = (state, res) => {
-  state.readonly = false;
-  return res;
-};
+  if (path === 'view.form.processing' && !value) {
+    render.urlInputEditable();
+    render.formButtonAble();
 
-const observUpdate = (state, url) => Promise.resolve(url)
-  .then(() => makeRequest(url))
-  .then(parser)
-  .then((parsedData) => extractUpdatedPosts(state, parsedData))
-  .then(setTimeout(() => observUpdate(state, url), 5000));
+    if (state.view.form.valid) {
+      render.urlInputClear();
+    }
+  }
 
-const view = (state, elms, i18next) => {
-  elms.form.addEventListener('submit', async (e) => {
-    const url = elms.input.value;
-    e.preventDefault();
-    validator(state)
-      .validate(url)
-      .then(() => formBlocked(state))
-      .then(() => makeRequest(url))
-      .then((res) => formUnlocked(state, res))
-      .then(parser)
-      .then((parsedData) => updateState(state, url, parsedData))
-      .then(addUlListener(state))
-      .then(setTimeout(() => observUpdate(state, url), 5000))
-      .catch((err) => {
-        state.error = i18next.t(err.message);
-      });
-  });
-};
+  if (path === 'feeds') {
+    render.renderFeeds(state.feeds);
+  }
 
-export default view;
+  if (path === 'posts') {
+    const buttonText = translate('buttons.review');
+    render.renderPosts(state.posts, state.view.visitedLinks, buttonText);
+  }
+
+  if (path === 'view.visitedLinks') {
+    const postId = [...value][value.size - 1];
+    render.setLinkVisited(postId);
+  }
+
+  if (path === 'view.showUpdatingErrorAlert' && value) {
+    render.showUpdatingErrorAlert();
+  }
+
+  if (path === 'view.showUpdatingErrorAlert' && !value) {
+    render.hideUpdatingErrorAlert();
+  }
+
+  if (path === 'view.modalWindowPostId') {
+    const [{ title, description, link }] = state.posts.filter((post) => post.id === value);
+    render.setModalWindow({ title, description, link });
+  }
+});
+
+export default watch;
