@@ -1,105 +1,82 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>RSS-агрегатор</title>
+    <title>RSS-aggregator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
   <body>
-    <div
-      class="modal fade"
-      id="modal"
-      tabindex="-1"
-      aria-labelledby="modal-title"
-      aria-hidden="true"
-      role="dialog"
-    >
+    <div id="modal" class="modal fade" tabindex="-1">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title"></h5>
-            <button
-              class="btn-close"
-              type="button"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <div class="modal-body"><p id="modal-content"></p></div>
+          <div class="modal-body">
+            <p></p>
+          </div>
           <div class="modal-footer">
-            <a
-              class="btn btn-primary"
-              id="modalRead"
-              type="button"
-              href="#"
-              target="blank"
-              >Читать полностью</a
-            ><button
-              class="btn btn-secondary"
-              id="modalClose"
-              type="button"
-              data-bs-dismiss="modal"
-            >
-              Закрыть
-            </button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            <a role="button" target="_blank" class="btn btn-primary full-article">Читать полностью</a>
           </div>
         </div>
       </div>
     </div>
-    <main class="flex">
-      <section class="container-fluid bg-dark p-5">
-        <div class="row">
-          <div class="col-md-10 col-lg-8 mx-auto text-white">
-            <h1 class="mb-0 display-3" id="title">RSS агрегатор</h1>
-            <p class="lead" id="subTitle">
-              Начните читать RSS сегодня! Это легко, это красиво.
-            </p>
-            <form class="text-body" id="form">
-              <div class="row">
-                <div class="col">
-                  <div class="form-floating">
-                    <input
-                      class="form-control"
-                      id="input"
-                      autofocus
-                      required
-                      placeholder="Ссылка RSS"
-                      aria-label="url"
-                    /><label id="label" for="input">Ссылка RSS</label>
-                  </div>
-                </div>
-                <div class="col-auto">
-                  <button
-                    class="btn btn-primary btn-lg px-5 h-100"
-                    id="addBtn"
-                    type="submit"
-                    aria-label="add"
-                    name="url"
-                  >
-                    Добавить
-                  </button>
+
+    <section class="container-fluid bg-dark p-5">
+      <div class="row">
+        <div class="fixed-top d-flex justify-content-end mt-2">
+          <div class="updating-error-alert alert alert-danger d-none" role="alert">Не удалось обновить посты</div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-12 col-lg-8 mx-auto text-white">
+          <h1 class="display-4">RSS-Агрегатор</h1>
+          <p class="lead">Начните читать RSS сегодня! Это легко, это красиво.</p>
+          <form class="rss-form text-body">
+            <div class="row">
+              <div class="col-sm-12 col-md-8 col-lg-10 mb-2">
+                <div class="form-floating">
+                  <input id="url-input" class="form-control" aria-label="url" name="url" placeholder="Ссылка RSS" autofocus autocomplete="off" required>
+                  <label for="url-input">Ссылка RSS</label>
                 </div>
               </div>
-            </form>
-            <p class="text-muted mt-2 mb-0" id="example">
-              Пример: https://ru.hexlet.io/lessons.rss
-            </p>
-            <p
-              class="small mb-0 text-danger position-absolute"
-              id="feedback"
-            ></p>
+              <div class="col-sm-12 col-md-4 col-lg-2 d-grid d-lg-block mb-2">
+                <button type="submit" aria-label="add" name="add" class="btn btn-primary btn-lg h-100 px-sm-5">Добавить</button>
+              </div>
+            </div>
+          </form>
+          <p class="text-muted mb-0">Пример: https://ru.hexlet.io/lessons.rss</p>
+          <p class="feedback small position-absolute"></p>
+        </div>
+      </div>
+    </section>
+    
+    <section class="container-fluid container-xxl p-5">
+      <div class="row">
+        <div class="posts col-sm-12 col-md-8">
+          <div class="card border-0 d-none">
+            <div class="card-body">
+              <h2 class="card-title h4">Посты</h2>
+            </div>
+            <ul class="list-group border-0 rounded-0"></ul>
           </div>
         </div>
-      </section>
-      <section class="container-fluid container-xxl p-5">
-        <div class="row">
-          <div class="col-md-10 col-lg-8 order-1 mx-auto" id="posts"></div>
-          <div
-            class="col-md-10 col-lg-4 order-0 order-lg-1 mx-auto"
-            id="feeds"
-          ></div>
+        <div class="feeds col-sm-12 col-md-4">
+          <div class="card border-0 d-none">
+            <div class="card-body">
+              <h2 class="card-title h4">Фиды</h2>
+            </div>
+            <ul class="list-group border-0 rounded-0"></ul>
+          </div>
         </div>
-      </section>
-    </main>
+      </div>
+    </section>
+    <footer class="footer border-top py-3 mt-5 bg-light">
+      <div class="container-xl">
+        <div class="text-center">created by <a href="https://github.com/Wenn911?tab=repositories" target="_blank">Wenn911</a>
+        </div>
+      </div>
+    </footer>
   </body>
 </html>
