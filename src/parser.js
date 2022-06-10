@@ -4,7 +4,7 @@ const parseXMLTree = (content, resourceLink) => {
   const errorNode = tree.querySelector('parsererror');
 
   if (errorNode) {
-    const error = new Error('ParsingError');
+    const error = new Error();
     error.isParserError = true;
     throw error;
   }
