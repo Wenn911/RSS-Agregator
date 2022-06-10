@@ -42,7 +42,7 @@ const watch = (state, translate) => onChange(state, (path, value) => {
     }
 
     case 'view.visitedLinks': {
-      const postId = [...value][value.size - 1];
+      const postId = [value];
       render.setLinkVisited(postId);
       break;
     }
