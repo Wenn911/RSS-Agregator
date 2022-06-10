@@ -2,70 +2,55 @@ import onChange from 'on-change';
 import render from './render.js';
 
 const watch = (state, translate) => onChange(state, (path, value) => {
-  switch (path) {
-    case 'view.form.valid': {
-      render.urlInputSetBorder(value);
-      break;
-    }
+  if (path === 'view.form.valid') {
+    render.urlInputSetBorder(value);
+  }
 
-    case 'view.form.message': {
-      const text = translate(value);
-      const { view: { form: { valid } } } = state;
-      render.setFormMessage(text, valid);
-      break;
-    }
+  if (path === 'view.form.message') {
+    const text = translate(value);
+    const { view: { form: { valid } } } = state;
+    render.setFormMessage(text, valid);
+  }
 
-    case 'view.form.processing' && value: {
-      render.urlInputReadonly();
-      render.formButtonDisable();
-      break;
-    }
+  if (path === 'view.form.processing' && value) {
+    render.urlInputReadonly();
+    render.formButtonDisable();
+  }
 
-    case 'view.form.processing' && !value: {
-      render.urlInputEditable();
-      render.formButtonAble();
+  if (path === 'view.form.processing' && !value) {
+    render.urlInputEditable();
+    render.formButtonAble();
 
-      if (state.view.form.valid) {
-        render.urlInputClear();
-      }
-      break;
+    if (state.view.form.valid) {
+      render.urlInputClear();
     }
+  }
 
-    case 'feeds': {
-      render.renderFeeds(state.feeds);
-      break;
-    }
+  if (path === 'feeds') {
+    render.renderFeeds(state.feeds);
+  }
 
-    case 'posts': {
-      const buttonText = translate('buttons.review');
-      render.renderPosts(state.posts, state.view.visitedLinks, buttonText);
-      break;
-    }
+  if (path === 'posts') {
+    const buttonText = translate('buttons.review');
+    render.renderPosts(state.posts, state.view.visitedLinks, buttonText);
+  }
 
-    case 'view.visitedLinks': {
-      const postId = [...value][value.size - 1];
-      render.setLinkVisited(postId);
-      break;
-    }
+  if (path === 'view.visitedLinks') {
+    const postId = [...value][value.size - 1];
+    render.setLinkVisited(postId);
+  }
 
-    case 'view.showUpdatingErrorAlert' && value: {
-      render.showUpdatingErrorAlert();
-      break;
-    }
+  if (path === 'view.showUpdatingErrorAlert' && value) {
+    render.showUpdatingErrorAlert();
+  }
 
-    case 'view.showUpdatingErrorAlert' && !value: {
-      render.hideUpdatingErrorAlert();
-      break;
-    }
+  if (path === 'view.showUpdatingErrorAlert' && !value) {
+    render.hideUpdatingErrorAlert();
+  }
 
-    case 'view.modalWindowPostId': {
-      const [{ title, description, link }] = state.posts.filter((post) => post.id === value);
-      render.setModalWindow({ title, description, link });
-      break;
-    }
-    default: {
-      break;
-    }
+  if (path === 'view.modalWindowPostId') {
+    const [{ title, description, link }] = state.posts.filter((post) => post.id === value);
+    render.setModalWindow({ title, description, link });
   }
 });
 
