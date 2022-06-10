@@ -2,55 +2,69 @@ import onChange from 'on-change';
 import render from './render.js';
 
 const watch = (state, translate) => onChange(state, (path, value) => {
-  if (path === 'view.form.valid') {
-    render.urlInputSetBorder(value);
-  }
-
-  if (path === 'view.form.message') {
-    const text = translate(value);
-    const { view: { form: { valid } } } = state;
-    render.setFormMessage(text, valid);
-  }
-
-  if (path === 'view.form.processing' && value) {
-    render.urlInputReadonly();
-    render.formButtonDisable();
-  }
-
-  if (path === 'view.form.processing' && !value) {
-    render.urlInputEditable();
-    render.formButtonAble();
-
-    if (state.view.form.valid) {
-      render.urlInputClear();
+  switch (path) {
+    case 'view.form.valid': {
+      render.urlInputSetBorder(value);
+      break;
     }
-  }
 
-  if (path === 'feeds') {
-    render.renderFeeds(state.feeds);
-  }
+    case 'view.form.message': {
+      const text = translate(value);
+      const { view: { form: { valid } } } = state;
+      render.setFormMessage(text, valid);
+      break;
+    }
 
-  if (path === 'posts') {
-    const buttonText = translate('buttons.review');
-    render.renderPosts(state.posts, state.view.visitedLinks, buttonText);
-  }
+    case 'view.form.processing' && value: {
+      if (value) {
+        render.urlInputReadonly();
+        render.formButtonDisable();
+      }
+      if (!value) {
+        render.urlInputEditable();
+        render.formButtonAble();
+      }
+      if (state.view.form.valid) {
+        render.urlInputClear();
+      }
+      break;
+    }
 
-  if (path === 'view.visitedLinks') {
-    const postId = [...value][value.size - 1];
-    render.setLinkVisited(postId);
-  }
+    case 'feeds': {
+      render.renderFeeds(state.feeds);
+      break;
+    }
 
-  if (path === 'view.showUpdatingErrorAlert' && value) {
-    render.showUpdatingErrorAlert();
-  }
+    case 'posts': {
+      const buttonText = translate('buttons.review');
+      render.renderPosts(state.posts, state.view.visitedLinks, buttonText);
+      break;
+    }
 
-  if (path === 'view.showUpdatingErrorAlert' && !value) {
-    render.hideUpdatingErrorAlert();
-  }
+    case 'view.visitedLinks': {
+      const postId = [...value][value.size - 1];
+      render.setLinkVisited(postId);
+      break;
+    }
 
-  if (path === 'view.modalWindowPostId') {
-    const [{ title, description, link }] = state.posts.filter((post) => post.id === value);
-    render.setModalWindow({ title, description, link });
+    case 'view.showUpdatingErrorAlert' && value: {
+      render.showUpdatingErrorAlert();
+      break;
+    }
+
+    case 'view.showUpdatingErrorAlert' && !value: {
+      render.hideUpdatingErrorAlert();
+      break;
+    }
+
+    case 'view.modalWindowPostId': {
+      const [{ title, description, link }] = state.posts.filter((post) => post.id === value);
+      render.setModalWindow({ title, description, link });
+      break;
+    }
+    default: {
+      break;
+    }
   }
 });
 
