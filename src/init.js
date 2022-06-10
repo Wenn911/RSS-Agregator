@@ -33,10 +33,6 @@ export default () => {
       notOneOf: 'urlFieldMessages.resourceIsExists',
     },
   });
-  axios.interceptors.response.use((res) => res, (err) => {
-    const modifiedError = { isAxiosError: true, ...err };
-    return Promise.reject(modifiedError);
-  });
 
   i18next
     .init({ lng: 'ru', debug: false, resources })
