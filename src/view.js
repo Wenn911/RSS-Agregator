@@ -15,7 +15,7 @@ const watch = (state, translate) => onChange(state, (path, value) => {
       break;
     }
 
-    case 'view.form.processing' && value: {
+    case 'view.form.processing': {
       if (value) {
         render.urlInputReadonly();
         render.formButtonDisable();
@@ -47,13 +47,13 @@ const watch = (state, translate) => onChange(state, (path, value) => {
       break;
     }
 
-    case 'view.showUpdatingErrorAlert' && value: {
-      render.showUpdatingErrorAlert();
-      break;
-    }
-
-    case 'view.showUpdatingErrorAlert' && !value: {
-      render.hideUpdatingErrorAlert();
+    case 'view.showUpdatingErrorAlert': {
+      if (value) {
+        render.showUpdatingErrorAlert();
+      }
+      if (!value) {
+        render.hideUpdatingErrorAlert();
+      }
       break;
     }
 
