@@ -5,7 +5,9 @@ const handleFormProcessing = (value) => {
   if (value) {
     render.urlInputReadonly();
     render.formButtonDisable();
-  } else {
+  }
+
+  if (!value) {
     render.urlInputEditable();
     render.formButtonAble();
   }
@@ -14,7 +16,9 @@ const handleFormProcessing = (value) => {
 const handleUpdatingErrorAlert = (value) => {
   if (value) {
     render.showUpdatingErrorAlert();
-  } else {
+  }
+
+  if (!value) {
     render.hideUpdatingErrorAlert();
   }
 };
