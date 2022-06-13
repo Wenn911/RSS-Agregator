@@ -6,7 +6,6 @@ const ru = {
       resourceIsExists: 'RSS уже существует',
       shouldNotBeEmpty: 'Не должно быть пустым',
       networkError: 'Ошибка сети',
-      loading: 'Загрузка...',
       success: 'RSS успешно загружен',
     },
     buttons: {

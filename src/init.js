@@ -16,7 +16,6 @@ export default () => {
       form: {
         valid: null,
         processing: false,
-        message: '',
       },
       modalWindowPostId: null,
       showUpdatingErrorAlert: false,
@@ -96,7 +95,6 @@ export default () => {
       const loadRss = (rssFeedURL) => {
         watchedState.view.form.processing = true;
         watchedState.view.form.valid = true;
-        watchedState.view.form.message = 'urlFieldMessages.loading';
         const proxyURL = getProxyUrl(rssFeedURL);
         return axios.get(proxyURL);
       };
