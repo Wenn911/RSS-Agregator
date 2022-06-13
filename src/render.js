@@ -8,12 +8,6 @@ const render = {
     }
   },
 
-  urlInputClear: () => {
-    const urlInput = document.querySelector('#url-input');
-    urlInput.value = '';
-    urlInput.focus();
-  },
-
   urlInputReadonly: () => {
     const urlInput = document.querySelector('#url-input');
     urlInput.setAttribute('readonly', 'true');
