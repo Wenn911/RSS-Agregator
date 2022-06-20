@@ -11,6 +11,21 @@ const handleUpdatingErrorAlert = (value) => {
   }
 };
 
+const handleFormProccesing = (value, state) => {
+  if (value) {
+    render.urlInputReadonly();
+    render.formButtonDisable();
+  }
+
+  if (!value) {
+    render.urlInputEditable();
+    render.formButtonAble();
+    if (state.view.form.valid) {
+      render.urlInputClear();
+    }
+  }
+};
+
 const watch = (state, translate) => onChange(state, (path, value) => {
   switch (path) {
     case 'view.form.valid': {
@@ -26,18 +41,7 @@ const watch = (state, translate) => onChange(state, (path, value) => {
     }
 
     case 'view.form.processing': {
-      if (value) {
-        render.urlInputReadonly();
-        render.formButtonDisable();
-      }
-
-      if (!value) {
-        render.urlInputEditable();
-        render.formButtonAble();
-        if (state.view.form.valid) {
-          render.urlInputClear();
-        }
-      }
+      handleFormProccesing(value, state);
       break;
     }
 
