@@ -7,6 +7,11 @@ const render = {
       urlInput.classList.add('is-invalid');
     }
   },
+  urlInputClear: () => {
+    const urlInput = document.querySelector('#url-input');
+    urlInput.value = '';
+    urlInput.focus();
+  },
 
   urlInputReadonly: () => {
     const urlInput = document.querySelector('#url-input');
