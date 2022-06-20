@@ -1,28 +1,6 @@
 import onChange from 'on-change';
 import render from './render.js';
 
-const handleFormProcessing = (value) => {
-  if (value) {
-    render.urlInputReadonly();
-    render.formButtonDisable();
-  }
-
-  if (!value) {
-    render.urlInputEditable();
-    render.formButtonAble();
-  }
-};
-
-const handleUpdatingErrorAlert = (value) => {
-  if (value) {
-    render.showUpdatingErrorAlert();
-  }
-
-  if (!value) {
-    render.hideUpdatingErrorAlert();
-  }
-};
-
 const watch = (state, translate) => onChange(state, (path, value) => {
   switch (path) {
     case 'view.form.valid': {
@@ -38,7 +16,14 @@ const watch = (state, translate) => onChange(state, (path, value) => {
     }
 
     case 'view.form.processing': {
-      handleFormProcessing(value);
+      if (value) {
+        render.urlInputReadonly();
+        render.formButtonDisable();
+      }
+      if (!value) {
+        render.urlInputEditable();
+        render.formButtonAble();
+      }
       break;
     }
 
@@ -60,7 +45,12 @@ const watch = (state, translate) => onChange(state, (path, value) => {
     }
 
     case 'view.showUpdatingErrorAlert': {
-      handleUpdatingErrorAlert(value);
+      if (value) {
+        render.showUpdatingErrorAlert();
+      }
+      if (!value) {
+        render.hideUpdatingErrorAlert();
+      }
       break;
     }
 
